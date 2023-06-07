@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <title>Student Result</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      form {
+        margin-bottom: 20px;
+      }
+
+      input[type="text"] {
+        padding: 10px;
+        font-size: 16px;
+        width: 300px;
+      }
+
+      input[type="submit"] {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      #searchResults {
+        margin-top: 20px;
+      }
+
+      .result-table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      .result-table th,
+      .result-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      .result-table th {
+        background-color: #f2f2f2;
+      }
+
+      .result-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      .result-table tr:hover {
+        background-color: #ddd;
+      }
+      .heading{
+        font-size: 36px;
+      }
+    </style>
+  </head>
+  <body>
+    <p class="heading">Student Results</p>
+    <form id="searchForm">
+      <input type="text" name="password" placeholder="Enter Roll Number">
+      <input type="submit" value="Search">
+    </form>
+
+    <div id="searchResults"></div>
+
+    <script>
+      document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var password = document.getElementById('searchForm').elements.password.value;
+        searchByPassword(password);
+      });
+
+      function searchByPassword(password) {
+        google.script.run.withSuccessHandler(displaySearchResults).processForm({ rollNumber: password });
+      }
+
+      function displaySearchResults(result) {
+        console.log('Search Headers:', result.headers);
+        console.log('Search Results:', result.searchResults);
+        var results = result.searchResults;
+        var headers = result.headers;
+        var resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = '';
+
+        if (results && results.length > 0) {
+          var table = document.createElement('table');
+          table.classList.add('result-table');
+
+          // Create table header
+          var thead = document.createElement('thead');
+          var headerRow = document.createElement('tr');
+          headers.forEach(function (header) {
+            var th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+          });
+          thead.appendChild(headerRow);
+          table.appendChild(thead);
+
+          // Create table body
+          var tbody = document.createElement('tbody');
+          results.forEach(function (row) {
+            var dataRow = document.createElement('tr');
+            row.forEach(function (data) {
+              var td = document.createElement('td');
+              td.textContent = data;
+              dataRow.appendChild(td);
+            });
+            tbody.appendChild(dataRow);
+          });
+          table.appendChild(tbody);
+
+          resultsContainer.appendChild(table);
+        } else {
+          resultsContainer.textContent = 'No results found.';
+        }
+      }
+    </script>
+  </body>
+</html>
